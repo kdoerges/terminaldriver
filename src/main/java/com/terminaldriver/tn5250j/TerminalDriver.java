@@ -10,12 +10,15 @@ import java.util.List;
 import java.util.Properties;
 
 import org.tn5250j.Session5250;
+import org.tn5250j.TN5250jConstants;
 import org.tn5250j.event.ScreenListener;
 import org.tn5250j.event.ScreenOIAListener;
 import org.tn5250j.event.SessionChangeEvent;
 import org.tn5250j.event.SessionListener;
 import org.tn5250j.framework.common.SessionManager;
 import org.tn5250j.framework.tn5250.ScreenOIA;
+import org.tn5250j.tools.logging.TN5250jLogFactory;
+import org.tn5250j.tools.logging.TN5250jLogger;
 
 import com.terminaldriver.common.TerminalDriverChangeListener;
 import com.terminaldriver.tn5250j.annotation.ScreenAttribute;
@@ -35,7 +38,7 @@ public class TerminalDriver implements Closeable {
 
 	@Getter
 	@Setter
-	String codePage = "37";
+	String codePage = "1141";
 
 	@Getter
 	Session5250 session;
@@ -84,6 +87,10 @@ public class TerminalDriver implements Closeable {
 	public void dumpScreen() {
 		session.getScreen().dumpScreen();
 	}
+	
+	public String getDumpScreen() {
+		return session.getScreen().getDumpScreen();
+	}
 
 	public void sendKeys(final String keys) {
 		fireSendKeys(keys);
@@ -95,9 +102,11 @@ public class TerminalDriver implements Closeable {
 		sessionProperties.put("SESSION_HOST", host);
 		sessionProperties.put("SESSION_HOST_PORT", String.valueOf(port));
 		sessionProperties.put("SESSION_CODE_PAGE", codePage);
+		sessionProperties.put(TN5250jConstants.SSL_TYPE, TN5250jConstants.SSL_TYPE_SSLv3);
+
+		TN5250jLogFactory.setLogLevels(TN5250jLogger.INFO);
 
 		session = SessionManager.instance().openSession(sessionProperties, "", "");
-
 		session.addSessionListener(driverSessionListener);
 
 		session.getScreen().addScreenListener(driverScreenListener);

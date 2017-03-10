@@ -27,7 +27,8 @@ public enum Key{
 	TAB("[tab]"),
 	EOF("[eof]"),
 	ERASE_EOF("[eraseeof]"),
-	ERASE_FIELD("[erasefld]");
+	ERASE_FIELD("[erasefld]"),
+	F3("[pf3]");
 	
 	private String code;
 	Key(final String code){this.code= code;}
