@@ -4,12 +4,13 @@
 
 	<groupId>com.terminaldriver.tn5250j</groupId>
 	<artifactId>terminaldriver-tn5250j</artifactId>
-	<version>0.1.0</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>terminaldriver-tn5250j</name>
 	<url>http://maven.apache.org</url>
 
+	<!-- Allgemeingueltige Einstellungen -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -56,7 +57,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.8</version>
+			<version>1.16.14</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

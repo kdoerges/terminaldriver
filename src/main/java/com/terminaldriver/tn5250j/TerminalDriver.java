@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.tn5250j.Session5250;
@@ -38,8 +39,12 @@ public class TerminalDriver implements Closeable {
 
 	@Getter
 	@Setter
-	String codePage = "1141";
+	String codePage = "37";
 
+	@Getter
+	@Setter
+	String sslType;
+	
 	@Getter
 	Session5250 session;
 
@@ -62,12 +67,37 @@ public class TerminalDriver implements Closeable {
 		super();
 	}
 
+	/**
+	 * Connect with default configuration.
+	 * @param host
+	 * @param port
+	 */
 	public void connectTo(final String host, final int port) {
 		this.host = host;
 		this.port = port;
 		createConn(host, port);
 	}
 
+	/**
+	 * Connect with given configuration.
+	 * @param aHost
+	 * @param aPort
+	 * @param someConfigs
+	 */
+	public void connectTo(final String aHost, final int aPort, final Map<String, Object> someConfigs) {
+		this.host = aHost;
+		this.port = aPort;
+		
+		if (someConfigs.containsKey("codePage")) {
+			this.codePage = (String)someConfigs.get("codePage");
+		}
+		
+		if (someConfigs.containsKey("SSL_TYPE")) {
+			this.sslType = (String)someConfigs.get("SSL_TYPE");
+		}
+		createConn(this.host, this.port);
+	}
+	
 	public String getScreenText() {
 		return new String(session.getScreen().getCharacters());
 	}
@@ -139,6 +169,7 @@ public class TerminalDriver implements Closeable {
 		session.addSessionListener(listener);
 	}
 
+	@Override
 	public void close() throws IOException {
 		session.disconnect();
 		for (final TerminalDriverChangeListener listener : listeners) {
@@ -360,6 +391,7 @@ public class TerminalDriver implements Closeable {
 		@Getter
 		long lastScreenUpdate;
 
+		@Override
 		public void onScreenChanged(final int arg0, final int row1, final int col1, final int row2, final int col2) {
 
 			if (row1 == 0 && col1 == 0 && row2 >= 23 && col2 >= 79) {
@@ -384,6 +416,7 @@ public class TerminalDriver implements Closeable {
 			lastScreenUpdate = System.currentTimeMillis();
 		}
 
+		@Override
 		public void onScreenSizeChanged(final int cols, final int rows) {
 			fireScreenSizeChanged(cols, rows);
 		}
@@ -405,12 +438,14 @@ public class TerminalDriver implements Closeable {
 
 	public static class TerminalDriverSessionListener implements SessionListener {
 
+		@Override
 		public void onSessionChanged(final SessionChangeEvent arg0) {
 		}
 	}
 
 	public class TerminDriverScreenOIAListener implements ScreenOIAListener {
 
+		@Override
 		public void onOIAChanged(final ScreenOIA arg0, final int arg1) {
 			if(arg1==ScreenOIAListener.OIA_CHANGED_INPUTINHIBITED){
 				fireInputInhibited(arg0.getInputInhibited() != ScreenOIA.INPUTINHIBITED_NOTINHIBITED);

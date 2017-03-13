@@ -1,41 +1,58 @@
 package com.terminaldriver.tn5250j;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.rules.ExternalResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Stellt eine Terminal-Instanz als Resource fuer JUnit Tests zur Verfuegung. Die Konfiguration fuer den Connect
- * erfolgt ueber ein Fluent-Interface.
- * 
+ * Create a TerminalResource for JUnit Access.
+ *  
  * @author doerges
  *
  */
 public class TerminalResource extends ExternalResource {
 
 	/**
-	 * Terminal
+	 * Logger
 	 */
-	public TerminalDriver driver;
+	private static final Logger logger = LoggerFactory.getLogger(TerminalResource.class);
 	
 	/**
-	 * Host fuer den Connect
+	 * Terminal
+	 */
+	private TerminalDriver driver;
+	
+	/**
+	 * Host-Terminal
 	 */
 	String host;
 	
 	/**
-	 * Port fuer den Connect
+	 * Port-Terminal
 	 */
 	int port;
+
+	/**
+	 * CodePage
+	 */
+	String codePage = null;
+
+	/**
+	 * SSL Type
+	 */
+	String sslType = null;
 	
 	/**
-	 * Gibt an ob das Terminal nach dem Test geschlossen werden soll.
-	 * Standard ist "false"
+	 * Set to true if connection should stay open after testcase.
 	 */
 	boolean reusableConnection = false;
 	
 	/**
-	 * Standard Konstruktor
+	 * Standard constructor
 	 */
 	public TerminalResource() {
 		host = "";
@@ -43,7 +60,7 @@ public class TerminalResource extends ExternalResource {
 	}
 	
 	/**
-	 * FluentInterface: Definition des Hosts.
+	 * FluentInterface: Define host
 	 * 
 	 * @param aHost
 	 * @return
@@ -54,7 +71,7 @@ public class TerminalResource extends ExternalResource {
 	}
 	
 	/**
-	 * FluentInterface: Definition des Ports.
+	 * FluentInterface: Define port
 	 * @param aPort
 	 * @return
 	 */
@@ -64,7 +81,27 @@ public class TerminalResource extends ExternalResource {
 	}
 	
 	/**
-	 * FluentInterface: Soll die Connection nach dem Test gehalten werden? 
+	 * FluentInterface: Define CodePage
+	 * @param aCodePage
+	 * @return
+	 */
+	public TerminalResource withCodePage(String aCodePage) {
+		this.codePage = aCodePage;
+		return this;
+	}
+	
+	/**
+	 * FluentInterface: Define SSL Type
+	 * @param aSSLType
+	 * @return
+	 */
+	public TerminalResource withSSLType(String aSSLType) {
+		this.sslType = aSSLType;
+		return this;
+	}
+	
+	/**
+	 * FluentInterface: Hold connection after TestCase. 
 	 * @param aDecision
 	 * @return
 	 */
@@ -74,19 +111,32 @@ public class TerminalResource extends ExternalResource {
 	}
 	
 	/**
-	 * Vor dem Testfall wird die Resource initialisiert
+	 * initialize resource before testcase.
 	 */
 	@Override
 	protected void before() throws Throwable {
 		if (reusableConnection) {
 			return;
 		}
-		driver =  new TerminalDriver();
-		driver.connectTo(host, port);
+		this.driver =  new TerminalDriver();
+		
+		Map<String, Object> configs = new HashMap<String, Object>();
+		
+		// create the config
+		if (this.codePage != null) {
+			configs.put("codePage", this.codePage);
+		}
+		
+		if (this.sslType != null) {
+			configs.put("SSL_TYPE", this.sslType);
+		}
+		
+		// connect to system with custom config
+		this.driver.connectTo(host, port, configs);
 	}
 	
 	/**
-	 * Nach dem Testfall wird das Terminal automatisch geschlossen
+	 * Clean up resource after testcase.
 	 */
 	@Override
 	protected void after() {
@@ -94,14 +144,18 @@ public class TerminalResource extends ExternalResource {
 			return;
 		}
 		try {
-			driver.close();
+			this.driver.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Cannot close terminal driver!", e);
 		}
 	}
 	
+	/**
+	 * Get driver instance.
+	 * 
+	 * @return
+	 */
 	public TerminalDriver getDriver() {
-		return driver;
+		return this.driver;
 	}
 }
