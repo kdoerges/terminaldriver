@@ -32,30 +32,51 @@ import com.terminaldriver.tn5250j.obj.ScreenTextBlock;
 import com.terminaldriver.tn5250j.util.ScreenFieldReader;
 import com.terminaldriver.tn5250j.util.ScreenUtils;
 
-import lombok.Getter;
-import lombok.Setter;
-
 public class TerminalDriver implements Closeable {
 
-	@Getter
-	@Setter
 	String codePage = "37";
 
-	@Getter
-	@Setter
+	public String getCodePage() {
+		return codePage;
+	}
+
+	public void setCodePage(String codePage) {
+		this.codePage = codePage;
+	}
+
 	String sslType;
 	
-	@Getter
+	public String getSslType() {
+		return sslType;
+	}
+
+	public void setSslType(String sslType) {
+		this.sslType = sslType;
+	}
+
 	Session5250 session;
 
-	@Getter
+	public Session5250 getSession() {
+		return session;
+	}
+
 	String host;
 
-	@Getter
+	public String getHost() {
+		return host;
+	}
+
 	int port;
 
-	@Getter
+	public int getPort() {
+		return port;
+	}
+
 	KeyStrokes keys = new KeyStrokes(this);
+
+	public KeyStrokes getKeys() {
+		return keys;
+	}
 
 	final TerminalDriverSessionListener driverSessionListener = new TerminalDriverSessionListener();
 	final TerminalDriverScreenListener driverScreenListener = new TerminalDriverScreenListener();
@@ -376,20 +397,29 @@ public class TerminalDriver implements Closeable {
 
 	public class TerminalDriverScreenListener implements ScreenListener {
 
-		@Setter
 		boolean suppressFullScreenEmpty = true;
+
+		public void setSuppressFullScreenEmpty(boolean suppressFullScreenEmpty) {
+			this.suppressFullScreenEmpty = suppressFullScreenEmpty;
+		}
 
 		/**
 		 * Time in milliseconds of the last time the full screen was changed
 		 */
-		@Getter
 		long lastScreenChange;
+		public long getLastScreenChange() {
+			return lastScreenChange;
+		}
+
 		/**
 		 * Time in milliseconds of the last time the screen was partially
 		 * updated
 		 */
-		@Getter
 		long lastScreenUpdate;
+
+		public long getLastScreenUpdate() {
+			return lastScreenUpdate;
+		}
 
 		@Override
 		public void onScreenChanged(final int arg0, final int row1, final int col1, final int row2, final int col2) {
