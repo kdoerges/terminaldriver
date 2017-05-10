@@ -30,7 +30,8 @@ public enum Key{
 	ERASE_FIELD("[erasefld]"),
 	F3("[pf3]"),
 	F9("[pf9]"),
-	F10("[pf10]");
+	F10("[pf10]"),
+	F16("[pf16]");
 	
 	private String code;
 	Key(final String code){this.code= code;}
