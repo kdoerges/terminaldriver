@@ -118,6 +118,10 @@ public class TerminalResource extends ExternalResource {
 		if (reusableConnection) {
 			return;
 		}
+		connect();
+	}
+	
+	public void connect() throws Throwable {
 		this.driver =  new TerminalDriver();
 		
 		Map<String, Object> configs = new HashMap<String, Object>();
@@ -143,6 +147,10 @@ public class TerminalResource extends ExternalResource {
 		if (reusableConnection) {
 			return;
 		}
+		disconnect();
+	}
+	
+	public void disconnect() {
 		try {
 			this.driver.close();
 		} catch (IOException e) {
